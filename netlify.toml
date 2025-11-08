@@ -5,8 +5,8 @@
   # Build command: Install dependencies then build the project
   command = "pnpm install && pnpm run build"
   
-  # Output directory: Where Vite puts the built files
-  publish = "dist"
+  # Output directory: Where Vite puts the built files (in servis-automat-pwa subdirectory)
+  publish = "servis-automat-pwa/dist"
   
   # Base directory (leave empty for React projects)
   base = ""
