@@ -1,0 +1,46 @@
+# Netlify Configuration for Servis Automat Klub PWA
+# This file tells Netlify how to build and deploy your project
+
+[build]
+  # Build command: Install dependencies then build the project
+  command = "pnpm install && pnpm run build"
+  
+  # Output directory: Where Vite puts the built files
+  publish = "dist"
+  
+  # Base directory (leave empty for React projects)
+  base = ""
+
+[build.environment]
+  # Node.js version to use during build
+  NODE_VERSION = "18"
+  
+  # Use pnpm as the package manager
+  NPM_FLAGS = "--version"
+
+# Headers for PWA functionality
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Service worker for PWA
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+# Manifest file for PWA
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
