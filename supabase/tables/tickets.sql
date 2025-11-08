@@ -1,0 +1,20 @@
+CREATE TABLE tickets (
+    id SERIAL PRIMARY KEY,
+    club_id INT NOT NULL,
+    machine_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'new' CHECK (status IN ('new',
+    'in_progress',
+    'waiting_parts',
+    'waiting_tax',
+    'closed')),
+    priority VARCHAR(10) NOT NULL DEFAULT 'normal' CHECK (priority IN ('low',
+    'normal',
+    'high')),
+    assigned_technician_id INT,
+    created_by_user_id INT NOT NULL,
+    closed_at TIMESTAMP,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
