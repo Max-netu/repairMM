@@ -9,7 +9,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'admin' | 'technician' | 'club';
+  role: 'admin' | 'technician' | 'hall';
   club_id: number | null;
   created_at: string;
   updated_at: string;
@@ -35,13 +35,19 @@ export interface Ticket {
   machine_id: number;
   title: string;
   description: string;
-  status: 'new' | 'in_progress' | 'waiting_parts' | 'waiting_tax' | 'closed';
-  priority: 'low' | 'normal' | 'high';
+  status: 'novo' | 'u_tijeku' | 'čeka se rezervni dio' | 'čeka se porezna' | 'zatvoreno';
   assigned_technician_id: number | null;
   created_by_user_id: number;
   closed_at: string | null;
   created_at: string;
   updated_at: string;
+  // New workflow fields
+  employee_name?: string;
+  manufacturer?: string;
+  game_name?: string;
+  can_play?: 'da' | 'ne';
+  request_number?: string;
+  comments?: string;
   club?: Club;
   machine?: Machine;
   created_by?: User;
@@ -57,27 +63,37 @@ export interface TicketAttachment {
   uploaded_at: string;
 }
 
+export interface StatusHistory {
+  id: number;
+  request_id: number;
+  old_status: string | null;
+  new_status: string;
+  comment: string;
+  changed_by: number;
+  created_at: string;
+  user?: User;
+}
+
 export interface DashboardStats {
   total: number;
-  new: number;
-  in_progress: number;
-  waiting_parts: number;
-  waiting_tax: number;
-  closed: number;
-  high_priority: number;
+  novo: number;
+  u_tijeku: number;
+  'čeka se rezervni dio': number;
+  'čeka se porezna': number;
+  zatvoreno: number;
   by_status: {
-    new: number;
-    in_progress: number;
-    waiting_parts: number;
-    waiting_tax: number;
-    closed: number;
+    novo: number;
+    u_tijeku: number;
+    'čeka se rezervni dio': number;
+    'čeka se porezna': number;
+    zatvoreno: number;
   };
   by_club?: Array<{
     club_id: number;
     club_name: string;
     total: number;
-    new: number;
-    in_progress: number;
-    closed: number;
+    novo: number;
+    u_tijeku: number;
+    zatvoreno: number;
   }>;
 }
