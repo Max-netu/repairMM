@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Ticket, FileText, BarChart3, User } from 'lucide-react';
+import { Home, Ticket, FileText, BarChart3, User, Users as UsersIcon } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 
 export default function BottomNav() {
@@ -12,6 +12,7 @@ export default function BottomNav() {
     { path: '/', icon: Home, label: 'Početna' },
     { path: '/tickets', icon: Ticket, label: 'Prijave' },
     ...(user?.role === 'club' ? [{ path: '/tickets/new', icon: FileText, label: 'Nova' }] : []),
+    ...(user?.role === 'admin' ? [{ path: '/admin/users', icon: UsersIcon, label: 'Korisnici' }] : []),
     { path: '/profile', icon: User, label: 'Profil' },
   ];
 
