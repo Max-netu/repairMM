@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Layout from '../components/Layout';
 import { useAuth } from '../lib/AuthContext';
 import { supabase, DashboardStats } from '../lib/supabase';
 import { getAuthToken } from '../lib/auth';
@@ -66,7 +67,7 @@ export default function DashboardPage() {
     switch (user?.role) {
       case 'admin': return 'Administrator';
       case 'technician': return 'Tehničar';
-      case 'club': return 'Klub';
+      case 'hall': return 'Klub';
       default: return 'Korisnik';
     }
   };
@@ -92,7 +93,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
               <AlertCircle className="w-8 h-8 text-red-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.new || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.novo || 0}</p>
             <p className="text-sm text-gray-600">Nove prijave</p>
           </div>
 
@@ -100,7 +101,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
               <Activity className="w-8 h-8 text-yellow-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.in_progress || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.u_tijeku || 0}</p>
             <p className="text-sm text-gray-600">U obradi</p>
           </div>
 
@@ -108,7 +109,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stats?.closed || 0}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.zatvoreno || 0}</p>
             <p className="text-sm text-gray-600">Zatvoreno</p>
           </div>
         </div>
@@ -118,23 +119,23 @@ export default function DashboardPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-gray-700">Nove</span>
-              <span className="font-semibold text-red-600">{stats?.by_status.new || 0}</span>
+              <span className="font-semibold text-red-600">{stats?.by_status.novo || 0}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-gray-700">U obradi</span>
-              <span className="font-semibold text-yellow-600">{stats?.by_status.in_progress || 0}</span>
+              <span className="font-semibold text-yellow-600">{stats?.by_status.u_tijeku || 0}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-gray-700">Čeka dijelove</span>
-              <span className="font-semibold text-orange-600">{stats?.by_status.waiting_parts || 0}</span>
+              <span className="font-semibold text-orange-600">{stats?.by_status['čeka se rezervni dio'] || 0}</span>
             </div>
             <div className="flex items-center justify-between py-2 border-b border-gray-100">
               <span className="text-gray-700">Čeka poreznu</span>
-              <span className="font-semibold text-purple-600">{stats?.by_status.waiting_tax || 0}</span>
+              <span className="font-semibold text-purple-600">{stats?.by_status['čeka se porezna'] || 0}</span>
             </div>
             <div className="flex items-center justify-between py-2">
               <span className="text-gray-700">Zatvoreno</span>
-              <span className="font-semibold text-green-600">{stats?.by_status.closed || 0}</span>
+              <span className="font-semibold text-green-600">{stats?.by_status.zatvoreno || 0}</span>
             </div>
           </div>
         </div>
@@ -153,15 +154,15 @@ export default function DashboardPage() {
                     </div>
                     <div>
                       <p className="text-gray-600">Nove</p>
-                      <p className="font-semibold text-red-600">{club.new}</p>
+                      <p className="font-semibold text-red-600">{club.novo}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">U obradi</p>
-                      <p className="font-semibold text-yellow-600">{club.in_progress}</p>
+                      <p className="font-semibold text-yellow-600">{club.u_tijeku}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">Zatvoreno</p>
-                      <p className="font-semibold text-green-600">{club.closed}</p>
+                      <p className="font-semibold text-green-600">{club.zatvoreno}</p>
                     </div>
                   </div>
                 </div>
