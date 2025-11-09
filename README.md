@@ -12,7 +12,7 @@ A complete Progressive Web App for managing slot machine repair tickets across F
 - **Admins:** Full oversight, assign/reassign, export data, analytics
 
 ### 📱 **Mobile-First PWA**
-- **Installable:** Works as native app on mobile devices
+- **Installable:** Works as native app on mobile devices  
 - **Offline Capable:** IndexedDB for drafts, background sync
 - **Croatian Interface:** Complete Croatian language UI
 - **Bottom Navigation:** Mobile-optimized navigation (Prijave · Nove · Moje · Statistika · Profil)
