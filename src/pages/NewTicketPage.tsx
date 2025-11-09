@@ -162,8 +162,8 @@ export default function NewTicketPage() {
   if (user?.role !== 'hall') {
     return (
       <Layout title="Novi Zahtjev">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-700">Samo djelatnici klubova mogu kreirati zahtjeve</p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
+          <p className="text-sm sm:text-base text-yellow-700">Samo djelatnici klubova mogu kreirati zahtjeve</p>
         </div>
       </Layout>
     );
@@ -171,21 +171,21 @@ export default function NewTicketPage() {
 
   return (
     <Layout title="Novi Zahtjev">
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+            <p className="text-sm sm:text-base text-red-600">{error}</p>
           </div>
         )}
 
         {success && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-green-600">{success}</p>
+          <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+            <p className="text-sm sm:text-base text-green-600">{success}</p>
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Osnovne informacije</h3>
+        <div className="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Osnovne informacije</h3>
           
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
@@ -197,7 +197,7 @@ export default function NewTicketPage() {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="Kratko opisanje problema"
             />
           </div>
@@ -212,7 +212,7 @@ export default function NewTicketPage() {
               value={formData.employeeName}
               onChange={(e) => setFormData({ ...formData, employeeName: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="Ime i prezime djelatnika koji prijavljuje"
             />
           </div>
@@ -226,7 +226,7 @@ export default function NewTicketPage() {
               value={formData.machineId}
               onChange={(e) => setFormData({ ...formData, machineId: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             >
               <option value="">Odaberite automat</option>
               {machines.map((machine) => (
@@ -244,26 +244,26 @@ export default function NewTicketPage() {
             <input
               id="inventoryNumber"
               type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="Inventarni broj (ako je poznat)"
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Informacije o igri</h3>
+        <div className="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Informacije o igri</h3>
           
           <div>
             <label htmlFor="manufacturer" className="block text-sm font-medium text-gray-700 mb-2">
               Proizvođač i igra *
             </label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <select
                 id="manufacturer"
                 value={formData.manufacturer}
                 onChange={(e) => setFormData({ ...formData, manufacturer: e.target.value })}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               >
                 <option value="">Proizvođač</option>
                 {MANUFACTURERS.map((manufacturer) => (
@@ -277,7 +277,7 @@ export default function NewTicketPage() {
                 value={formData.gameName}
                 onChange={(e) => setFormData({ ...formData, gameName: e.target.value })}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 placeholder="Naziv igre"
               />
             </div>
@@ -287,8 +287,8 @@ export default function NewTicketPage() {
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Dopušta li neispravnost dalje igrati? *
             </label>
-            <div className="flex space-x-6">
-              <label className="flex items-center">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
+              <label className="flex items-center py-2 px-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="radio"
                   name="canPlay"
@@ -296,11 +296,11 @@ export default function NewTicketPage() {
                   checked={formData.canPlay === 'da'}
                   onChange={(e) => setFormData({ ...formData, canPlay: e.target.value })}
                   required
-                  className="mr-2 text-blue-600 focus:ring-blue-500"
+                  className="mr-3 text-blue-600 focus:ring-blue-500 w-4 h-4"
                 />
-                <span className="text-gray-700">Da</span>
+                <span className="text-sm sm:text-base text-gray-700">Da</span>
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center py-2 px-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
                 <input
                   type="radio"
                   name="canPlay"
@@ -308,16 +308,16 @@ export default function NewTicketPage() {
                   checked={formData.canPlay === 'ne'}
                   onChange={(e) => setFormData({ ...formData, canPlay: e.target.value })}
                   required
-                  className="mr-2 text-blue-600 focus:ring-blue-500"
+                  className="mr-3 text-blue-600 focus:ring-blue-500 w-4 h-4"
                 />
-                <span className="text-gray-700">Ne</span>
+                <span className="text-sm sm:text-base text-gray-700">Ne</span>
               </label>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Opis problema</h3>
+        <div className="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Opis problema</h3>
           
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
@@ -329,7 +329,7 @@ export default function NewTicketPage() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               placeholder="Detaljno opisanje problema..."
             />
           </div>
@@ -342,7 +342,7 @@ export default function NewTicketPage() {
               id="priority"
               value={formData.priority}
               onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             >
               <option value="low">Nizak</option>
               <option value="normal">Normalan</option>
@@ -359,7 +359,7 @@ export default function NewTicketPage() {
                 id="technician"
                 value={formData.assignedTechnicianId}
                 onChange={(e) => setFormData({ ...formData, assignedTechnicianId: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               >
                 <option value="">Automatski dodijeli</option>
                 {technicians.map((tech) => (
@@ -372,14 +372,15 @@ export default function NewTicketPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Fotografije</h3>
+        <div className="bg-white rounded-lg shadow-sm sm:shadow p-4 sm:p-6 space-y-3 sm:space-y-4">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4">Fotografije</h3>
           
           <div>
-            <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+            <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-500 transition-colors touch-manipulation">
               <div className="text-center">
-                <Camera className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                <Camera className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mx-auto mb-2" />
                 <span className="text-sm text-gray-600">Dodaj fotografije</span>
+                <span className="text-xs text-gray-500 block mt-1">Dodirnite za otvaranje kamere</span>
               </div>
               <input
                 type="file"
@@ -387,24 +388,25 @@ export default function NewTicketPage() {
                 multiple
                 onChange={handleFileSelect}
                 className="hidden"
+                capture="environment"
               />
             </label>
 
             {attachments.length > 0 && (
-              <div className="grid grid-cols-3 gap-2 mt-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-2 mt-4">
                 {attachments.map((att, index) => (
                   <div key={index} className="relative">
                     <img
                       src={att.preview}
                       alt={`Prilog ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
+                      className="w-full h-20 sm:h-24 object-cover rounded-lg"
                     />
                     <button
                       type="button"
                       onClick={() => removeAttachment(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 touch-manipulation"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
                     </button>
                   </div>
                 ))}
@@ -416,7 +418,7 @@ export default function NewTicketPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold py-3 sm:py-4 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation text-sm sm:text-base"
         >
           {loading ? 'Kreiranje...' : 'Kreiraj Zahtjev'}
         </button>
