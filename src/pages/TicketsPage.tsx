@@ -86,6 +86,12 @@ export default function TicketsPage() {
   return (
     <Layout title="Zahtjevi">
       <div className="space-y-3 sm:space-y-4">
+        {/* Debug info - remove after testing */}
+        <div className="bg-gray-100 p-2 rounded text-xs">
+          <p>User: {user?.name} | Role: {user?.role} | Email: {user?.email}</p>
+          <p>Button should show for role 'hall' - Current role: {user?.role === 'hall' ? 'YES' : 'NO'}</p>
+        </div>
+
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
             <p className="text-sm sm:text-base text-red-600">{error}</p>
@@ -135,12 +141,23 @@ export default function TicketsPage() {
           </button>
         </div>
 
-        {/* Create New Ticket Button - Only for hall users */}
+        {/* Create New Ticket Button - Debug version shows for all roles */}
+        <div className="flex justify-end">
+          <button
+            onClick={() => navigate('/tickets/new')}
+            className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation"
+            style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+          >
+            <Plus className="w-6 h-6 sm:w-7 sm:h-7" />
+          </button>
+        </div>
+
+        {/* Original button with proper role check - keep for production */}
         {user?.role === 'hall' && (
           <div className="flex justify-end">
             <button
               onClick={() => navigate('/tickets/new')}
-              className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation"
+              className="fixed bottom-20 left-4 sm:bottom-24 sm:left-6 z-40 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation"
               style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
             >
               <Plus className="w-6 h-6 sm:w-7 sm:h-7" />
