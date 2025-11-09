@@ -22,7 +22,7 @@ Deno.serve(async (req) => {
       throw new Error('Token je istekao');
     }
 
-    const { ticketId, status, priority, comment } = await req.json();
+    const { ticketId, status, comment } = await req.json();
 
     if (!ticketId) {
       throw new Error('ID zahtjeva je obavezan');
@@ -85,10 +85,6 @@ Deno.serve(async (req) => {
       if (status === 'zatvoreno') {
         updates.closed_at = new Date().toISOString();
       }
-    }
-
-    if (priority && payload.role === 'admin') {
-      updates.priority = priority;
     }
 
     // Update ticket

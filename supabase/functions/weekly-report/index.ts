@@ -86,7 +86,6 @@ Deno.serve(async (req) => {
       totalTickets: tickets.length,
       byStatus: {},
       byClub: {},
-      byPriority: {},
       byTechnician: {},
       createdThisWeek: tickets.filter(t => new Date(t.created_at) >= weekStart).length,
       closedThisWeek: tickets.filter(t => t.status === 'zatvoreno' && new Date(t.closed_at) >= weekStart).length,
@@ -102,9 +101,6 @@ Deno.serve(async (req) => {
       const clubName = clubMap[ticket.club_id]?.name || 'Nepoznat';
       stats.byClub[clubName] = (stats.byClub[clubName] || 0) + 1;
       
-      // By priority
-      stats.byPriority[ticket.priority] = (stats.byPriority[ticket.priority] || 0) + 1;
-      
       // By technician
       if (ticket.assigned_technician_id) {
         const techName = userMap[ticket.assigned_technician_id]?.name || 'Nedodijeljen';
@@ -115,152 +111,121 @@ Deno.serve(async (req) => {
     // Calculate average resolution time
     const resolvedTickets = tickets.filter(t => t.status === 'zatvoreno' && t.closed_at);
     if (resolvedTickets.length > 0) {
-      const totalResolutionTime = resolvedTickets.reduce((sum, ticket) => {
-        const created = new Date(ticket.created_at);
-        const closed = new Date(ticket.closed_at);
-        return sum + (closed.getTime() - created.getTime());
+      const totalTime = resolvedTickets.reduce((sum, t) => {
+        const created = new Date(t.created_at);
+        const closed = new Date(t.closed_at);
+        return sum + (closed - created);
       }, 0);
-      stats.averageResolutionTime = Math.round(totalResolutionTime / resolvedTickets.length / (1000 * 60 * 60 * 24)); // days
+      stats.averageResolutionTime = Math.round(totalTime / resolvedTickets.length / (1000 * 60 * 60 * 24)); // Days
     }
 
     // Generate HTML report
-    const reportDate = now.toLocaleDateString('hr-HR');
-    const reportStartDate = weekStart.toLocaleDateString('hr-HR');
-
     const htmlReport = `
-      <h1>Tjedni izvještaj - Zahtjevi za popravak</h1>
-      <p><strong>Period:</strong> ${reportStartDate} - ${reportDate}</p>
-      
-      <h2>Općenita statistika</h2>
-      <ul>
-        <li><strong>Ukupno zahtjeva:</strong> ${stats.totalTickets}</li>
-        <li><strong>Kreirano ovaj tjedan:</strong> ${stats.createdThisWeek}</li>
-        <li><strong>Zatvoreno ovaj tjedan:</strong> ${stats.closedThisWeek}</li>
-        <li><strong>Prosječno vrijeme rješavanja:</strong> ${stats.averageResolutionTime} dana</li>
-      </ul>
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Tjedni izvještaj - ${new Date().toLocaleDateString('hr-HR')}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .section { margin: 20px 0; }
+          .section h2 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+          ul { list-style-type: none; padding: 0; }
+          li { margin: 5px 0; padding: 8px; background: #f5f5f5; border-radius: 4px; }
+          table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #f2f2f2; }
+          .summary { background: #e8f4fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Tjedni izvještaj zahtjeva za servis</h1>
+          <p>Period: ${weekStartStr} - ${now.toISOString().split('T')[0]}</p>
+          <p>Generiran: ${new Date().toLocaleString('hr-HR')}</p>
+        </div>
 
-      <h2>Zahtjevi po statusu</h2>
-      <ul>
-        ${Object.entries(stats.byStatus).map(([status, count]) => 
-          `<li><strong>${status}:</strong> ${count}</li>`
-        ).join('')}
-      </ul>
+        <div class="summary">
+          <h2>Sažetak</h2>
+          <p><strong>Ukupno zahtjeva:</strong> ${stats.totalTickets}</p>
+          <p><strong>Kreirano ovaj tjedan:</strong> ${stats.createdThisWeek}</p>
+          <p><strong>Zatvoreno ovaj tjedan:</strong> ${stats.closedThisWeek}</p>
+          <p><strong>Prosječno vrijeme rješavanja:</strong> ${stats.averageResolutionTime} dana</p>
+        </div>
 
-      <h2>Zahtjevi po klubovima</h2>
-      <ul>
-        ${Object.entries(stats.byClub).map(([club, count]) => 
-          `<li><strong>${club}:</strong> ${count}</li>`
-        ).join('')}
-      </ul>
+        <div class="section">
+          <h2>Zahtjevi po statusu</h2>
+          <ul>
+            ${Object.entries(stats.byStatus).map(([status, count]) => 
+              `<li><strong>${status}:</strong> ${count}</li>`
+            ).join('')}
+          </ul>
+        </div>
 
-      <h2>Zahtjevi po prioritetu</h2>
-      <ul>
-        ${Object.entries(stats.byPriority).map(([priority, count]) => 
-          `<li><strong>${priority}:</strong> ${count}</li>`
-        ).join('')}
-      </ul>
+        <div class="section">
+          <h2>Zahtjevi po klubovima</h2>
+          <ul>
+            ${Object.entries(stats.byClub).map(([club, count]) => 
+              `<li><strong>${club}:</strong> ${count}</li>`
+            ).join('')}
+          </ul>
+        </div>
 
-      <h2>Zahtjevi po tehničarima</h2>
-      <ul>
-        ${Object.entries(stats.byTechnician).map(([tech, count]) => 
-          `<li><strong>${tech}:</strong> ${count}</li>`
-        ).join('')}
-      </ul>
+        <div class="section">
+          <h2>Zahtjevi po tehničarima</h2>
+          <ul>
+            ${Object.entries(stats.byTechnician).map(([tech, count]) => 
+              `<li><strong>${tech}:</strong> ${count}</li>`
+            ).join('')}
+          </ul>
+        </div>
 
-      <h2>Detaljni popis zahtjeva</h2>
-      <table border="1" style="border-collapse: collapse; width: 100%;">
-        <tr style="background-color: #f2f2f2;">
-          <th>Broj</th>
-          <th>Naslov</th>
-          <th>Klub</th>
-          <th>Status</th>
-          <th>Prioritet</th>
-          <th>Djelatnik</th>
-          <th>Tehničar</th>
-          <th>Kreiran</th>
-        </tr>
-        ${tickets.map(ticket => `
-          <tr>
-            <td>${ticket.request_number || 'N/A'}</td>
-            <td>${ticket.title}</td>
-            <td>${clubMap[ticket.club_id]?.name || 'Nepoznat'}</td>
-            <td>${ticket.status}</td>
-            <td>${ticket.priority}</td>
-            <td>${ticket.employee_name || 'N/A'}</td>
-            <td>${userMap[ticket.assigned_technician_id]?.name || 'Nedodijeljen'}</td>
-            <td>${new Date(ticket.created_at).toLocaleDateString('hr-HR')}</td>
-          </tr>
-        `).join('')}
-      </table>
+        <div class="section">
+          <h2>Detaljni popis zahtjeva</h2>
+          <table border="1" style="border-collapse: collapse; width: 100%;">
+            <thead>
+              <tr>
+                <th>Broj</th>
+                <th>Naslov</th>
+                <th>Klub</th>
+                <th>Status</th>
+                <th>Zaposlenik</th>
+                <th>Tehničar</th>
+                <th>Kreiran</th>
+                <th>Zatvoren</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tickets.map(ticket => `
+                <tr>
+                  <td>${ticket.request_number || 'N/A'}</td>
+                  <td>${ticket.title}</td>
+                  <td>${clubMap[ticket.club_id]?.name || 'Nepoznat'}</td>
+                  <td>${ticket.status}</td>
+                  <td>${ticket.employee_name || 'N/A'}</td>
+                  <td>${userMap[ticket.assigned_technician_id]?.name || 'Nedodijeljen'}</td>
+                  <td>${new Date(ticket.created_at).toLocaleDateString('hr-HR')}</td>
+                  <td>${ticket.closed_at ? new Date(ticket.closed_at).toLocaleDateString('hr-HR') : 'N/A'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </body>
+      </html>
     `;
 
-    // Send report to all admins via email
-    const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    
-    if (resendApiKey) {
-      const admins = users.filter(user => user.role === 'admin');
-      
-      const emailPromises = admins.map(async (admin) => {
-        const emailData = {
-          from: 'noreply@favbet.hr',
-          to: [admin.email],
-          subject: `Tjedni izvještaj - Zahtjevi za popravak (${reportDate})`,
-          html: htmlReport
-        };
-
-        const emailResponse = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(emailData)
-        });
-
-        if (!emailResponse.ok) {
-          const error = await emailResponse.text();
-          console.error(`Failed to send weekly report to ${admin.email}:`, error);
-          return { success: false, email: admin.email, error };
-        }
-
-        return { success: true, email: admin.email };
-      });
-
-      const emailResults = await Promise.all(emailPromises);
-      const successCount = emailResults.filter(result => result.success).length;
-
-      return new Response(JSON.stringify({
-        data: {
-          message: `Tjedni izvještaj uspješno poslan: ${successCount}/${admins.length} adminima`,
-          reportDate: reportDate,
-          period: `${reportStartDate} - ${reportDate}`,
-          statistics: stats,
-          emailResults: emailResults
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-
-    } else {
-      console.log('RESEND_API_KEY not configured, skipping email reports');
-      
-      return new Response(JSON.stringify({
-        data: {
-          message: 'Tjedni izvještaj generiran (email preskočen - RESEND_API_KEY nije konfiguriran)',
-          reportDate: reportDate,
-          period: `${reportStartDate} - ${reportDate}`,
-          statistics: stats,
-          htmlReport: htmlReport
-        }
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+    return new Response(htmlReport, {
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/html; charset=utf-8'
+      }
+    });
 
   } catch (error) {
     return new Response(JSON.stringify({
       error: {
-        code: 'WEEKLY_REPORT_ERROR',
+        code: 'REPORT_ERROR',
         message: error.message
       }
     }), {
