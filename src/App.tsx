@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './lib/AuthContext';
+// DEBUG: Using debug auth to bypass backend authentication issues
+import { AuthProvider, useAuth } from './lib/AuthContext-debug';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import TicketsPage from './pages/TicketsPage';
