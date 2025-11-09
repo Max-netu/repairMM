@@ -13,31 +13,65 @@ Deno.serve(async (req) => {
   try {
     const userToken = req.headers.get('x-user-token');
     if (!userToken) {
-      throw new Error('No user token');
+      throw new Error('Nedostaje korisnički token');
     }
 
     const payload = JSON.parse(atob(userToken));
-    // Token already parsed above
 
     if (payload.exp < Date.now()) {
-      throw new Error('Token expired');
+      throw new Error('Token je istekao');
     }
 
-    const { clubId, machineId, title, description, priority, attachments } = await req.json();
+    // Extract all required fields from the new workflow
+    const { 
+      clubId, 
+      machineId, 
+      title, 
+      description, 
+      priority,
+      employeeName,  // Required: Employee name
+      manufacturer,  // Required: Manufacturer (APEX, ATRONIC, EGT, etc.)
+      gameName,      // Required: Game name
+      canPlay,       // Required: 'da' or 'ne'
+      assignedTechnicianId,  // Optional: Pre-assign technician
+      attachments 
+    } = await req.json();
 
-    if (!clubId || !machineId || !title) {
-      throw new Error('Club ID, Machine ID, and title are required');
+    // Validate required fields according to workflow specification
+    if (!clubId || !machineId || !title || !employeeName || !manufacturer || !gameName || !canPlay) {
+      throw new Error('Obavezna polja: Klub, Automat, Naslov, Ime djelatnika, Proizvođač, Igre, Može li igrati');
     }
 
-    // Verify club user can only create tickets for their club
-    if (payload.role === 'club' && payload.clubId !== clubId) {
-      throw new Error('Not authorized to create tickets for this club');
+    // Validate canPlay value
+    if (!['da', 'ne'].includes(canPlay)) {
+      throw new Error('Polje "Može li igrati" mora biti "da" ili "ne"');
+    }
+
+    // Verify hall user can only create tickets for their club
+    if (payload.role === 'hall' && payload.clubId !== clubId) {
+      throw new Error('Nemate dozvolu za kreiranje zahtjeva za ovaj klub');
     }
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
-    // Create ticket
+    // Get the auto-generated request number
+    const requestNumberResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/generate_request_number`, {
+      method: 'POST',
+      headers: {
+        'apikey': serviceRoleKey!,
+        'Authorization': `Bearer ${serviceRoleKey}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!requestNumberResponse.ok) {
+      throw new Error('Neuspješno generiranje broja zahtjeva');
+    }
+
+    const requestNumber = await requestNumberResponse.text();
+
+    // Create ticket with all new workflow fields
     const ticketResponse = await fetch(`${supabaseUrl}/rest/v1/tickets`, {
       method: 'POST',
       headers: {
@@ -51,19 +85,46 @@ Deno.serve(async (req) => {
         machine_id: machineId,
         title,
         description: description || '',
-        status: 'new',
+        status: 'novo',  // Croatian status
         priority: priority || 'normal',
+        employee_name: employeeName,
+        manufacturer,
+        game_name: gameName,
+        can_play: canPlay,
+        request_number: requestNumber.replace(/"/g, ''), // Remove quotes from string response
+        assigned_technician_id: assignedTechnicianId || null,
         created_by_user_id: payload.userId
       })
     });
 
     if (!ticketResponse.ok) {
       const error = await ticketResponse.text();
-      throw new Error(`Failed to create ticket: ${error}`);
+      throw new Error(`Neuspješno kreiranje zahtjeva: ${error}`);
     }
 
     const tickets = await ticketResponse.json();
     const ticket = tickets[0];
+
+    // Create initial status history entry
+    const historyResponse = await fetch(`${supabaseUrl}/rest/v1/request_status_history`, {
+      method: 'POST',
+      headers: {
+        'apikey': serviceRoleKey!,
+        'Authorization': `Bearer ${serviceRoleKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        request_id: ticket.id,
+        old_status: null,
+        new_status: 'novo',
+        comment: `Zahtjev kreiran: ${title}`,
+        changed_by: payload.userId
+      })
+    });
+
+    if (!historyResponse.ok) {
+      console.error('Failed to create status history:', await historyResponse.text());
+    }
 
     // Handle file attachments if provided
     if (attachments && attachments.length > 0) {
@@ -115,8 +176,35 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Send notification to admins
+    try {
+      await fetch(`${supabaseUrl}/functions/v1/send-notification`, {
+        method: 'POST',
+        headers: {
+          'apikey': serviceRoleKey!,
+          'Authorization': `Bearer ${serviceRoleKey}`,
+          'Content-Type': 'application/json',
+          'x-user-token': userToken
+        },
+        body: JSON.stringify({
+          type: 'new_request',
+          ticketId: ticket.id,
+          requestNumber: ticket.request_number,
+          title: ticket.title,
+          clubId: clubId,
+          employeeName: employeeName
+        })
+      });
+    } catch (notificationError) {
+      console.error('Failed to send notification:', notificationError);
+      // Don't fail the whole request if notification fails
+    }
+
     return new Response(JSON.stringify({
-      data: { ticket }
+      data: { 
+        ticket,
+        message: `Zahtjev uspješno kreiran! Broj: ${ticket.request_number}`
+      }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
