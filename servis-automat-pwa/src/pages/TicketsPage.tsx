@@ -51,116 +51,159 @@ export default function TicketsPage() {
       zatvoreno: { label: 'Zatvoreno', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
     };
 
-    const badge = badges[status] || { label: status, color: 'bg-gray-100 text-gray-700', icon: Circle };
+    const badge = badges[status] || badges.novo;
     const Icon = badge.icon;
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-xs font-medium ${badge.color}`}>
+      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
         <Icon className="w-3 h-3" />
         {badge.label}
       </span>
     );
   };
 
+
+
   const filteredTickets = filter === 'all' 
     ? tickets 
-    : tickets.filter(ticket => ticket.status === filter);
-
-  const getFilterLabel = (filter: string) => {
-    const labels: Record<string, string> = {
-      all: 'Svi',
-      novo: 'Novi',
-      u_tijeku: 'U tijeku',
-      zatvoreno: 'Zatvoreni'
-    };
-    return labels[filter] || filter;
-  };
+    : tickets.filter(t => t.status === filter);
 
   if (loading) {
     return (
-      <Layout title="Prijave">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-gray-500">Učitavanje zahtjeva...</div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (error) {
-    return (
-      <Layout title="Prijave">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+      <Layout title="Zahtjevi">
+        <div className="flex items-center justify-center py-8 sm:py-12">
+          <div className="text-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Učitavanje...</p>
+          </div>
         </div>
       </Layout>
     );
   }
 
   return (
-    <Layout title="Prijave">
-      <div className="space-y-4">
-        {/* Filter tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
-          {['all', 'novo', 'u_tijeku', 'zatvoreno'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab)}
-              className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                filter === tab
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
-              {getFilterLabel(tab)}
-            </button>
-          ))}
+    <Layout title="Zahtjevi">
+      <div className="space-y-3 sm:space-y-4">
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+            <p className="text-sm sm:text-base text-red-600">{error}</p>
+          </div>
+        )}
+
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
+              filter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+            }`}
+          >
+            Svi ({tickets.length})
+          </button>
+          <button
+            onClick={() => setFilter('novo')}
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
+              filter === 'novo'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+            }`}
+          >
+            Novi ({tickets.filter(t => t.status === 'novo').length})
+          </button>
+          <button
+            onClick={() => setFilter('u_tijeku')}
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
+              filter === 'u_tijeku'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+            }`}
+          >
+            U tijeku ({tickets.filter(t => t.status === 'u_tijeku').length})
+          </button>
+          <button
+            onClick={() => setFilter('zatvoreno')}
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
+              filter === 'zatvoreno'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
+            }`}
+          >
+            Zatvoreni ({tickets.filter(t => t.status === 'zatvoreno').length})
+          </button>
         </div>
 
-        {/* Tickets list */}
-        <div className="space-y-3">
-          {filteredTickets.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              {filter === 'all' 
-                ? 'Nema zahtjeva' 
-                : `Nema zahtjeva sa statusom "${getFilterLabel(filter)}"`
-              }
-            </div>
-          ) : (
-            filteredTickets.map((ticket) => (
+        {filteredTickets.length === 0 ? (
+          <div className="bg-white rounded-lg shadow-sm sm:shadow p-6 sm:p-8 text-center">
+            <p className="text-sm sm:text-base text-gray-500">Nema zahtjeva</p>
+          </div>
+        ) : (
+          <div className="space-y-2 sm:space-y-3">
+            {filteredTickets.map((ticket) => (
               <Link
                 key={ticket.id}
                 to={`/tickets/${ticket.id}`}
-                className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-300 hover:shadow-md transition-all"
+                className="block bg-white rounded-lg shadow-sm sm:shadow hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      {getStatusBadge(ticket.status)}
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      {ticket.request_number && (
+                        <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
+                          #{ticket.request_number}
+                        </span>
+                      )}
                     </div>
-
-                    {ticket.assigned_technician && (
-                      <div className="text-xs text-gray-600">
-                        Tehničar: {ticket.assigned_technician.name}
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base line-clamp-2">{ticket.title}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                      <span className="font-medium">{ticket.club?.name}</span>
+                      <div className="flex items-center gap-1">
+                        <span>Automat #{ticket.machine?.number}</span>
+                        {ticket.employee_name && (
+                          <>
+                            <span className="hidden sm:inline">•</span>
+                            <span>{ticket.employee_name}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {ticket.manufacturer && ticket.game_name && (
+                      <div className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-1">
+                        {ticket.manufacturer} - {ticket.game_name}
+                        {ticket.can_play && (
+                          <span className="ml-2">
+                            ({ticket.can_play === 'da' ? 'Može igrati' : 'Ne može igrati'})
+                          </span>
+                        )}
                       </div>
                     )}
-
-                    <div className="text-xs text-gray-500 mt-2">
-                      {new Date(ticket.created_at).toLocaleDateString('hr-HR', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
                   </div>
-                  
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 ml-2" />
+                </div>
+
+                <div className="flex items-center gap-2 mb-2">
+                  {getStatusBadge(ticket.status)}
+                </div>
+
+                {ticket.assigned_technician && (
+                  <div className="text-xs text-gray-600">
+                    Tehničar: {ticket.assigned_technician.name}
+                  </div>
+                )}
+
+                <div className="text-xs text-gray-500 mt-2">
+                  {new Date(ticket.created_at).toLocaleDateString('hr-HR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </div>
               </Link>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );
