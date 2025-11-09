@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { useAuth } from '../lib/AuthContext';
 import { supabase, Ticket } from '../lib/supabase';
 import { getAuthToken } from '../lib/auth';
-import { Circle, Clock, Package, FileX, CheckCircle, ChevronRight } from 'lucide-react';
+import { Circle, Clock, Package, FileX, CheckCircle, ChevronRight, Plus } from 'lucide-react';
 
 export default function TicketsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,51 +49,34 @@ export default function TicketsPage() {
       u_tijeku: { label: 'U tijeku', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock },
       'čeka se rezervni dio': { label: 'Čeka se rezervni dio', color: 'bg-orange-100 text-orange-700 border-orange-200', icon: Package },
       'čeka se porezna': { label: 'Čeka se porezna', color: 'bg-purple-100 text-purple-700 border-purple-200', icon: FileX },
-      zatvoreno: { label: 'Zatvoreno', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
+      'radovi u tijeku': { label: 'Radovi u tijeku', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Clock },
+      'završeno': { label: 'Završeno', color: 'bg-green-100 text-green-700 border-green-200', icon: CheckCircle },
+      zatvoreno: { label: 'Zatvoreno', color: 'bg-gray-100 text-gray-700 border-gray-200', icon: CheckCircle }
     };
 
     const badge = badges[status] || badges.novo;
-    const Icon = badge.icon;
+    const IconComponent = badge.icon;
 
     return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
-        <Icon className="w-3 h-3" />
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
+        <IconComponent className="w-3 h-3" />
         {badge.label}
       </span>
     );
   };
 
-  const getPriorityBadge = (priority: string) => {
-    const colors: Record<string, string> = {
-      low: 'bg-gray-100 text-gray-700',
-      normal: 'bg-blue-100 text-blue-700',
-      high: 'bg-red-100 text-red-700',
-    };
-
-    const labels: Record<string, string> = {
-      low: 'Nizak',
-      normal: 'Normalan',
-      high: 'Visok',
-    };
-
-    return (
-      <span className={`inline-flex px-2 py-1 rounded text-xs font-medium ${colors[priority]}`}>
-        {labels[priority]}
-      </span>
-    );
-  };
-
-  const filteredTickets = filter === 'all' 
-    ? tickets 
-    : tickets.filter(t => t.status === filter);
+  const filteredTickets = tickets.filter(ticket => {
+    if (filter === 'all') return true;
+    return ticket.status === filter;
+  });
 
   if (loading) {
     return (
       <Layout title="Zahtjevi">
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-8 sm:py-12">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-            <p className="mt-4 text-gray-600">Učitavanje...</p>
+            <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600">Učitavanje...</p>
           </div>
         </div>
       </Layout>
@@ -101,106 +85,119 @@ export default function TicketsPage() {
 
   return (
     <Layout title="Zahtjevi">
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-600">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+            <p className="text-sm sm:text-base text-red-600">{error}</p>
           </div>
         )}
 
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <button
             onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
               filter === 'all'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
             }`}
           >
             Svi ({tickets.length})
           </button>
           <button
             onClick={() => setFilter('novo')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
               filter === 'novo'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
             }`}
           >
             Novi ({tickets.filter(t => t.status === 'novo').length})
           </button>
           <button
             onClick={() => setFilter('u_tijeku')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
               filter === 'u_tijeku'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
             }`}
           >
             U tijeku ({tickets.filter(t => t.status === 'u_tijeku').length})
           </button>
           <button
             onClick={() => setFilter('zatvoreno')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-colors touch-manipulation ${
               filter === 'zatvoreno'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 active:bg-gray-100'
             }`}
           >
             Zatvoreni ({tickets.filter(t => t.status === 'zatvoreno').length})
           </button>
         </div>
 
+        {/* Create New Ticket Button - Only for hall users */}
+        {user?.role === 'hall' && (
+          <div className="flex justify-end">
+            <button
+              onClick={() => navigate('/tickets/new')}
+              className="fixed bottom-20 right-4 sm:bottom-24 sm:right-6 z-40 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation"
+              style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
+            >
+              <Plus className="w-6 h-6 sm:w-7 sm:h-7" />
+            </button>
+          </div>
+        )}
+
         {filteredTickets.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500">Nema zahtjeva</p>
+          <div className="bg-white rounded-lg shadow-sm sm:shadow p-6 sm:p-8 text-center">
+            <p className="text-sm sm:text-base text-gray-500">Nema zahtjeva</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {filteredTickets.map((ticket) => (
               <Link
                 key={ticket.id}
                 to={`/tickets/${ticket.id}`}
-                className="block bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4"
+                className="block bg-white rounded-lg shadow-sm sm:shadow hover:shadow-md transition-shadow p-3 sm:p-4 touch-manipulation"
               >
                 <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {ticket.request_number && (
-                        <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded flex-shrink-0">
                           #{ticket.request_number}
                         </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-1">{ticket.title}</h3>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <span>{ticket.club?.name}</span>
-                      <span>•</span>
-                      <span>Automat #{ticket.machine?.number}</span>
-                      {ticket.employee_name && (
-                        <>
-                          <span>•</span>
-                          <span>{ticket.employee_name}</span>
-                        </>
-                      )}
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base line-clamp-2">{ticket.title}</h3>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-600">
+                      <span className="font-medium">{ticket.club?.name}</span>
+                      <div className="flex items-center gap-1">
+                        <span>Automat #{ticket.machine?.number}</span>
+                        {ticket.employee_name && (
+                          <>
+                            <span className="hidden sm:inline">•</span>
+                            <span>{ticket.employee_name}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                     {ticket.manufacturer && ticket.game_name && (
-                      <div className="text-sm text-gray-500 mt-1">
+                      <div className="text-xs sm:text-sm text-gray-500 mt-1 line-clamp-1">
                         {ticket.manufacturer} - {ticket.game_name}
                         {ticket.can_play && (
-                          <span className="ml-2 text-xs">
+                          <span className="ml-2">
                             ({ticket.can_play === 'da' ? 'Može igrati' : 'Ne može igrati'})
                           </span>
                         )}
                       </div>
                     )}
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 ml-2" />
                 </div>
 
                 <div className="flex items-center gap-2 mb-2">
                   {getStatusBadge(ticket.status)}
-                  {getPriorityBadge(ticket.priority)}
                 </div>
 
                 {ticket.assigned_technician && (
