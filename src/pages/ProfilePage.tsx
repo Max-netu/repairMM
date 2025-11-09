@@ -13,7 +13,7 @@ export default function ProfilePage() {
     switch (user?.role) {
       case 'admin': return 'Administrator';
       case 'technician': return 'Tehničar';
-      case 'club': return 'Klub';
+      case 'hall': return 'Klub';
       default: return 'Korisnik';
     }
   };
