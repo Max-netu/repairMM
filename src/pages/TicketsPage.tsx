@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { useAuth } from '../lib/AuthContext';
+// FIXED: Import debug auth to match App.tsx
+import { useAuth } from '../lib/AuthContext-debug';
 import { supabase, Ticket } from '../lib/supabase';
 import { getAuthToken } from '../lib/auth';
 import { Circle, Clock, Package, FileX, CheckCircle, ChevronRight, Plus } from 'lucide-react';
