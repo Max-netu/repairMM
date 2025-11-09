@@ -30,19 +30,21 @@ Deno.serve(async (req) => {
         }
 
         const supabaseUrl = Deno.env.get('SUPABASE_URL');
-        const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
 
         // Get all users with their club information
-        const usersResponse = await fetch(`${supabaseUrl}/rest/v1/users?select=*,clubs(name,city)`, {
+        const usersResponse = await fetch(`${supabaseUrl}/rest/v1/users?select=id,name,email,role,club_id,created_at,clubs(name,city)`, {
             headers: {
-                'Authorization': `Bearer ${supabaseServiceKey}`,
-                'apikey': supabaseServiceKey,
+                'Authorization': `Bearer ${supabaseAnonKey}`,
+                'apikey': supabaseAnonKey,
                 'Content-Type': 'application/json'
             }
         });
 
         if (!usersResponse.ok) {
-            throw new Error('Failed to fetch users');
+            const errorText = await usersResponse.text();
+            console.error('Supabase API error:', errorText);
+            throw new Error(`Failed to fetch users: ${usersResponse.status} ${errorText}`);
         }
 
         const users = await usersResponse.json();
