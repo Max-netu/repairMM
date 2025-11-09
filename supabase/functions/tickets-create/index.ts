@@ -28,7 +28,6 @@ Deno.serve(async (req) => {
       machineId, 
       title, 
       description, 
-      priority,
       employeeName,  // Required: Employee name
       manufacturer,  // Required: Manufacturer (APEX, ATRONIC, EGT, etc.)
       gameName,      // Required: Game name
@@ -86,7 +85,6 @@ Deno.serve(async (req) => {
         title,
         description: description || '',
         status: 'novo',  // Croatian status
-        priority: priority || 'normal',
         employee_name: employeeName,
         manufacturer,
         game_name: gameName,
