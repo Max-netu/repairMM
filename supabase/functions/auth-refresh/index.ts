@@ -13,7 +13,7 @@ Deno.serve(async (req) => {
   try {
     const userToken = req.headers.get('x-user-token');
     
-    if (!authHeader) {
+    if (!userToken) {
       throw new Error('No user token');
     }
 

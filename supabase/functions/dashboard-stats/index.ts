@@ -51,18 +51,17 @@ Deno.serve(async (req) => {
     // Calculate statistics
     const stats = {
       total: tickets.length,
-      new: tickets.filter((t: any) => t.status === 'new').length,
-      in_progress: tickets.filter((t: any) => t.status === 'in_progress').length,
-      waiting_parts: tickets.filter((t: any) => t.status === 'waiting_parts').length,
-      waiting_tax: tickets.filter((t: any) => t.status === 'waiting_tax').length,
-      closed: tickets.filter((t: any) => t.status === 'closed').length,
-      high_priority: tickets.filter((t: any) => t.priority === 'high').length,
+      novo: tickets.filter((t: any) => t.status === 'novo').length,
+      u_tijeku: tickets.filter((t: any) => t.status === 'u_tijeku').length,
+      'čeka se rezervni dio': tickets.filter((t: any) => t.status === 'čeka se rezervni dio').length,
+      'čeka se porezna': tickets.filter((t: any) => t.status === 'čeka se porezna').length,
+      zatvoreno: tickets.filter((t: any) => t.status === 'zatvoreno').length,
       by_status: {
-        new: tickets.filter((t: any) => t.status === 'new').length,
-        in_progress: tickets.filter((t: any) => t.status === 'in_progress').length,
-        waiting_parts: tickets.filter((t: any) => t.status === 'waiting_parts').length,
-        waiting_tax: tickets.filter((t: any) => t.status === 'waiting_tax').length,
-        closed: tickets.filter((t: any) => t.status === 'closed').length,
+        novo: tickets.filter((t: any) => t.status === 'novo').length,
+        u_tijeku: tickets.filter((t: any) => t.status === 'u_tijeku').length,
+        'čeka se rezervni dio': tickets.filter((t: any) => t.status === 'čeka se rezervni dio').length,
+        'čeka se porezna': tickets.filter((t: any) => t.status === 'čeka se porezna').length,
+        zatvoreno: tickets.filter((t: any) => t.status === 'zatvoreno').length,
       }
     };
 
@@ -87,9 +86,9 @@ Deno.serve(async (req) => {
           club_id: clubId,
           club_name: club?.name || 'Unknown',
           total: clubTickets.length,
-          new: clubTickets.filter((t: any) => t.status === 'new').length,
-          in_progress: clubTickets.filter((t: any) => t.status === 'in_progress').length,
-          closed: clubTickets.filter((t: any) => t.status === 'closed').length,
+          novo: clubTickets.filter((t: any) => t.status === 'novo').length,
+          u_tijeku: clubTickets.filter((t: any) => t.status === 'u_tijeku').length,
+          zatvoreno: clubTickets.filter((t: any) => t.status === 'zatvoreno').length,
         };
       });
 
