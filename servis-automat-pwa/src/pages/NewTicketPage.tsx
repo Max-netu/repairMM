@@ -14,14 +14,14 @@ const MANUFACTURERS = [
 export default function NewTicketPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [machines, setMachines] = useState<Machine[]>([]);
   const [technicians, setTechnicians] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
   const [formData, setFormData] = useState({
-    machineId: '',
+    serialNumber: '',
+    inventoryNumber: '',
     title: '',
     description: '',
     employeeName: '',
@@ -34,27 +34,8 @@ export default function NewTicketPage() {
   const [attachments, setAttachments] = useState<Array<{ file: File; preview: string }>>([]);
 
   useEffect(() => {
-    loadMachines();
     loadTechnicians();
   }, []);
-
-  async function loadMachines() {
-    if (!user?.club_id) return;
-
-    try {
-      const token = await getAuthToken();
-      const { data, error } = await supabase
-        .from('machines')
-        .select('*')
-        .eq('club_id', user.club_id)
-        .order('number');
-
-      if (error) throw error;
-      setMachines(data || []);
-    } catch (err: any) {
-      console.error('Failed to load machines:', err);
-    }
-  }
 
   async function loadTechnicians() {
     try {
@@ -100,15 +81,17 @@ export default function NewTicketPage() {
 
       const token = await getAuthToken();
 
-      // Convert attachments to base64
+      // Convert files to base64
       const attachmentsData = await Promise.all(
         attachments.map(async (att) => {
-          return new Promise((resolve, reject) => {
+          return new Promise<{ fileData: string; fileName: string }>((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve({
-              fileData: reader.result as string,
-              fileName: att.file.name
-            });
+            reader.onloadend = () => {
+              resolve({
+                fileData: reader.result as string,
+                fileName: att.file.name
+              });
+            };
             reader.onerror = reject;
             reader.readAsDataURL(att.file);
           });
@@ -118,7 +101,8 @@ export default function NewTicketPage() {
       const { data, error: funcError } = await supabase.functions.invoke('tickets-create', {
         body: {
           clubId: user.club_id,
-          machineId: parseInt(formData.machineId),
+          serialNumber: formData.serialNumber,
+          inventoryNumber: formData.inventoryNumber,
           title: formData.title,
           description: formData.description,
           employeeName: formData.employeeName,
@@ -214,34 +198,32 @@ export default function NewTicketPage() {
           </div>
 
           <div>
-            <label htmlFor="machine" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="serialNumber" className="block text-sm font-medium text-gray-700 mb-2">
               Serijski broj automata *
             </label>
-            <select
-              id="machine"
-              value={formData.machineId}
-              onChange={(e) => setFormData({ ...formData, machineId: e.target.value })}
+            <input
+              id="serialNumber"
+              type="text"
+              value={formData.serialNumber}
+              onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
               required
               className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-            >
-              <option value="">Odaberite automat</option>
-              {machines.map((machine) => (
-                <option key={machine.id} value={machine.id}>
-                  {machine.number} - {machine.model}
-                </option>
-              ))}
-            </select>
+              placeholder="Unesite serijski broj automata"
+            />
           </div>
 
           <div>
             <label htmlFor="inventoryNumber" className="block text-sm font-medium text-gray-700 mb-2">
-              Inventarni broj
+              Inventarni broj *
             </label>
             <input
               id="inventoryNumber"
               type="text"
+              value={formData.inventoryNumber}
+              onChange={(e) => setFormData({ ...formData, inventoryNumber: e.target.value })}
+              required
               className="w-full px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
-              placeholder="Inventarni broj (ako je poznat)"
+              placeholder="Unesite inventarni broj"
             />
           </div>
         </div>
