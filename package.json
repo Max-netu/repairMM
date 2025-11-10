@@ -1,7 +1,7 @@
 {
-  "name": "servis-automat-klub-pwa",
+  "name": "servis-automat-pwa",
+  "private": true,
   "version": "1.0.0",
-  "description": "Progressive Web App for managing slot machine repair tickets in Croatian with role-based access control",
   "type": "module",
   "scripts": {
     "dev": "pnpm install --prefer-offline && vite",
@@ -12,26 +12,6 @@
     "install-deps": "pnpm install --prefer-offline",
     "clean": "rm -rf node_modules .pnpm-store pnpm-lock.yaml && pnpm store prune"
   },
-  "keywords": [
-    "pwa",
-    "react",
-    "typescript",
-    "slot-machine",
-    "repair-management",
-    "croatian",
-    "supabase",
-    "mobile-first",
-    "offline",
-    "tickets",
-    "workforce-management"
-  ],
-  "author": "MiniMax Agent",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Max-netu/repairMM.git"
-  },
-  "homepage": "https://yrkq63r4vtmi.space.minimax.io",
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.2",
@@ -102,21 +82,5 @@
     "typescript-eslint": "^8.15.0",
     "vite": "^6.0.1",
     "vite-plugin-source-identifier": "1.1.2"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   }
 }
