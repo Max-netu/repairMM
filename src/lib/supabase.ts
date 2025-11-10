@@ -32,17 +32,17 @@ export interface Machine {
 export interface Ticket {
   id: number;
   club_id: number;
-  machine_id: number;
   title: string;
   description: string;
   status: 'novo' | 'u_tijeku' | 'čeka se rezervni dio' | 'čeka se porezna' | 'zatvoreno';
-  priority: 'low' | 'normal' | 'high';
   assigned_technician_id: number | null;
   created_by_user_id: number;
   closed_at: string | null;
   created_at: string;
   updated_at: string;
   // New workflow fields
+  serial_number: string;
+  inventory_number: string;
   employee_name?: string;
   manufacturer?: string;
   game_name?: string;
@@ -50,7 +50,6 @@ export interface Ticket {
   request_number?: string;
   comments?: string;
   club?: Club;
-  machine?: Machine;
   created_by?: User;
   assigned_technician?: User;
   attachments?: TicketAttachment[];
@@ -77,25 +76,43 @@ export interface StatusHistory {
 
 export interface DashboardStats {
   total: number;
+  // Хорватские ключи (основные)
   novo: number;
   u_tijeku: number;
   'čeka se rezervni dio': number;
   'čeka se porezna': number;
   zatvoreno: number;
-  high_priority: number;
+  // Английские ключи (альтернативные, на случай обратной совместимости)
+  new?: number;
+  in_progress?: number;
+  waiting_parts?: number;
+  waiting_tax?: number;
+  completed?: number;
   by_status: {
+    // Хорватские ключи
     novo: number;
     u_tijeku: number;
     'čeka se rezervni dio': number;
     'čeka se porezna': number;
     zatvoreno: number;
+    // Английские ключи
+    new?: number;
+    in_progress?: number;
+    waiting_parts?: number;
+    waiting_tax?: number;
+    completed?: number;
   };
   by_club?: Array<{
     club_id: number;
     club_name: string;
     total: number;
+    // Хорватские ключи
     novo: number;
     u_tijeku: number;
     zatvoreno: number;
+    // Английские ключи
+    new?: number;
+    in_progress?: number;
+    completed?: number;
   }>;
 }
