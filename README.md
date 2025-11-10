@@ -32,6 +32,12 @@ A complete Progressive Web App for managing slot machine repair tickets across F
 - Automated weekly reports (cron job)
 - Push notifications for ticket assignments
 
+### ✅ **Latest Updates (Nov 2025)**
+- **Fixed dashboard statistics:** Croatian status keys now work correctly
+- **Enhanced logging:** Added debug logging for dashboard-stats function
+- **Improved TypeScript interfaces:** Support for both Croatian and English status keys
+- **Better error handling:** More robust error handling in frontend components
+
 ## 🚀 Live Demo
 
 **Application URL:** https://yrkq63r4vtmi.space.minimax.io
@@ -123,7 +129,7 @@ pnpm build
   - `tickets-create` - Create new tickets (v4 with auto-numbering)
   - `tickets-update` - Update ticket status (v4 with history tracking)
   - `tickets-assign` - Assign tickets to technicians
-  - `dashboard-stats` - Analytics data for all roles
+  - `dashboard-stats` - Analytics data for all roles (FIXED: Croatian status keys)
   - `send-notification` - Email notifications for new requests
   - `weekly-report` - Admin reporting (JWT protected)
   - `weekly-report-cron` - Automated weekly reports
@@ -232,6 +238,23 @@ The application is fully localized for Croatian with:
 - **Email Notifications:** Automatic alerts to admins for new requests
 - **Weekly Reports:** Automated Monday 9:00 reports via pg_cron
 - **Status Validation:** Only valid transitions allowed per Croatian workflow
+
+## 🛠️ Recent Bug Fixes
+
+### Dashboard Statistics Fix (Nov 2025)
+- **Problem:** Dashboard showed 0 for new tickets due to key mismatch
+- **Root Cause:** Supabase function used English keys (`new`, `in_progress`) while frontend expected Croatian keys (`novo`, `u_tijeku`)
+- **Solution:** 
+  - Updated `dashboard-stats` function to use Croatian status keys
+  - Enhanced `DashboardStats` TypeScript interface to support both languages
+  - Added debug logging to track data flow
+  - Fixed frontend to correctly read Croatian status keys
+
+### Code Quality Improvements
+- Added comprehensive logging in `dashboard-stats` Edge Function
+- Enhanced error handling in `DashboardPage.tsx`
+- Improved TypeScript interfaces for better type safety
+- Added fallback support for both language variants
 
 ## 🤝 Contributing
 
